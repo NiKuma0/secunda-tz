@@ -1,0 +1,36 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.3
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: uv
+        language: system
+        files: '^.*\.(py|pyi)$'
+        args: ["run", "pyright", "--threads 5"]
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: uv
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: ["run", "pytest"]
+
+  - repo: local
+    hooks:
+      - id: pyright
+        name: uv lock
+        entry: uv
+        language: system
+        pass_filenames: false
+        files: '(pyproject.toml|uv.lock)'
+        args: ["lock", "--check"]

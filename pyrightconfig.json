@@ -1,0 +1,24 @@
+{
+  "include": ["src"],
+  "exclude": [
+    "**/*.toml",
+    "**/*.ini", 
+    "**/*.lock",
+    "**/*.md",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.json",
+    "**/migrations/**",
+    "**/__pycache__/**",
+    ".venv/**",
+  ],
+  "venvPath": ".",
+  "venv": ".venv",
+  "typeCheckingMode": "strict",
+  // External libs is not typed some times:
+  "ignoreMissingImports": true,
+  "reportMissingTypeStubs": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownArgumentType": "none"
+}

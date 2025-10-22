@@ -1,0 +1,22 @@
+[project]
+name = "secunda-tz"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.17.0",
+    "asyncpg>=0.30.0",
+    "fastapi>=0.119.1",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "sqlalchemy>=2.0.44",
+    "uvicorn>=0.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "pyright>=1.1.406",
+    "ruff>=0.14.1",
+]
