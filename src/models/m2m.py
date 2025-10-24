@@ -26,11 +26,8 @@ class OrganizationSpecializations(Base):
 class OrganizationBuilding(Base):
     __tablename__ = 'organization_buildings'
 
-
+    organization_id: orm.Mapped[int] = orm.mapped_column(sa.ForeignKey('organizations.id'), primary_key=True)
     organization: orm.Mapped['Organization'] = orm.relationship('Organization')
-    organization_id: orm.Mapped[int] = orm.mapped_column(sa.ForeignKey('organizations.id'))
 
-    building: orm.Mapped['Building'] = orm.relationship('Building')
     building_id: orm.Mapped[int] = orm.mapped_column(sa.ForeignKey('buildings.id'))
-
-    __mapper_args__ = {'primary_key': (organization_id, building_id)}  # noqa: RUF012
+    building: orm.Mapped['Building'] = orm.relationship('Building')
