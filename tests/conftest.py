@@ -58,6 +58,9 @@ async def db():
     engine = async_sa.create_async_engine(test_db_url)
 
     async with engine.begin() as conn:
+        await conn.run_sync(
+            lambda conn: conn.execute(sa.text('CREATE EXTENSION IF NOT EXISTS postgis')),
+        )
         await conn.run_sync(models.Base.metadata.create_all)
     await engine.dispose()
 
@@ -86,7 +89,7 @@ async def get_sessionmaker(connection: async_sa.AsyncConnection) -> async_sa.asy
     return async_sa.async_sessionmaker(connection, expire_on_commit=False)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture
 async def session(
     connection: async_sa.AsyncConnection, sessionmaker: async_sa.async_sessionmaker[async_sa.AsyncSession]
 ):
@@ -98,4 +101,3 @@ async def session(
         await session.close()
         await trans.rollback()
         await connection.close()
-
