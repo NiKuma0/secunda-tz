@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgis/postgis:18-3.6
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  migrations:
+    build: ./
+    environment:
+      - POSTGRES_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: alembic upgrade head
+
+  app:
+    build: ./
+    environment:
+      - POSTGRES_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - migrations
+
+volumes:
+  postgres_data:
