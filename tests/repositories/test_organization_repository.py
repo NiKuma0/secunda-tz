@@ -8,7 +8,8 @@ from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src import models, schemas
+from src import schemas
+from src.db import models
 from src.repositories import OrganizationRepository
 
 

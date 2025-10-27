@@ -6,14 +6,15 @@ from geoalchemy2 import Geography
 from geoalchemy2.shape import to_shape
 from sqlalchemy import orm
 
-from src import deps, models, schemas
+from src import schemas
+from src.db import SessionDep, models
 
 if typing.TYPE_CHECKING:
     from shapely import Point
 
 
 class OrganizationRepository:
-    def __init__(self, session: deps.SessionDep):
+    def __init__(self, session: SessionDep):
         self._session = session
 
     @staticmethod

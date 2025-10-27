@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+import sqlalchemy.dialects.postgresql as psql
 from sqlalchemy import orm
 
 from .base import Base
@@ -18,8 +19,7 @@ class Organization(Base):
     phone: orm.Mapped[str]
 
     # Non-optional association - every organization must have a building
-    building_assoc: orm.Mapped['OrganizationBuilding'] = orm.relationship(
-        'OrganizationBuilding', uselist=False)
+    building_assoc: orm.Mapped['OrganizationBuilding'] = orm.relationship('OrganizationBuilding', uselist=False)
 
     # Convenience property to get the building directly
     building: orm.Mapped['Building'] = orm.relationship(
@@ -33,3 +33,4 @@ class Organization(Base):
         secondary='organization_specializations',
         backref='organizations',
     )
+    search_vector: orm.Mapped[str] = orm.mapped_column(psql.TSVECTOR, nullable=True)

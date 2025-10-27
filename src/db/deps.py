@@ -3,7 +3,7 @@ import typing
 import fastapi
 import sqlalchemy.ext.asyncio as sa_async
 
-from .settings import settings
+from src.settings import settings
 
 engine = sa_async.create_async_engine(str(settings.POSTGRES_DSN))
 sessionmaker = sa_async.async_sessionmaker(engine)

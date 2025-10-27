@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy import engine as sa_engine
 from sqlalchemy.ext import asyncio as async_sa
 
-from src import models
+from src.db import models
 from src.settings import settings
 
 TEST_DB_NAME = 'test'

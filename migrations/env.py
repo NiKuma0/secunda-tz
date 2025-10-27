@@ -1,3 +1,4 @@
+import logging
 import asyncio
 from logging.config import fileConfig
 
@@ -5,18 +6,34 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from alembic_utils.replaceable_entity import register_entities
 from alembic import context
 
-from src.models import Base
+from src.db import models, functions, triggers
 from src.settings import settings
+
+target_metadata = models.Base.metadata
+ENTITIES = (
+    functions.check_specialization_depth,
+    triggers.trg_specialization_depth_check,
+    functions.ensure_org_has_building,
+    triggers.trg_ensure_org_has_building,
+    triggers.trg_building_update_search_vector,
+    triggers.trg_specialization_update_search_vector,
+)
+ENTITIES_NAMES = {entity.to_variable_name() for entity in ENTITIES}
+ENTITIES_TYPES = {'trigger', 'function'}
+ALWAYS_ALLOWED = {'column', 'index'}
+
+register_entities(ENTITIES)
+
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", str(settings.POSTGRES_DSN))
+config.set_main_option('sqlalchemy.url', str(settings.POSTGRES_DSN))
 
 
 def run_migrations_offline() -> None:
@@ -44,7 +61,28 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    logger = logging.getLogger('alembic.runtime.migration')
+
+    def checker(name: str | None, type_: str, _):
+        res: bool
+        match type_:
+            case 'table':
+                res = name in target_metadata.tables
+            case _ if type_ in ENTITIES_TYPES:
+                res = name in ENTITIES_NAMES
+            case _ if type_ in ALWAYS_ALLOWED:
+                res = True
+            case _:
+                res = False
+        if res: 
+            logger.info("%s, %s", name, type_)
+        return res
+
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_name=checker
+    )
 
     with context.begin_transaction():
         context.run_migrations()
