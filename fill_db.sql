@@ -2,18 +2,18 @@ BEGIN;
 
 -- Insert buildings
 INSERT INTO buildings (id, address, point) VALUES
-    (1, '123 Main St', (-73.935242, 40.730610)),
-    (2, '456 Park Ave', (-73.973794, 40.764225)),
-    (3, '789 Broadway', (-73.989308, 40.748817)),
-    (4, '321 5th Ave', (-73.985428, 40.748459)),
-    (5, '567 Madison Ave', (-73.974036, 40.762905)),
-    (6, '890 Lexington Ave', (-73.968285, 40.762466)),
-    (7, '432 6th Ave', (-73.996702, 40.737143)),
-    (8, '765 3rd Ave', (-73.971635, 40.753729)),
-    (9, '234 7th Ave', (-73.995669, 40.743825)),
-    (10, '876 2nd Ave', (-73.969748, 40.750709)),
-    (11, '543 8th Ave', (-73.992960, 40.754672)),
-    (12, '901 1st Ave', (-73.963894, 40.759832));
+    (1, '123 Main St', ST_POINT(-73.935242, 40.730610, 4326)),
+    (2, '456 Park Ave', ST_POINT(-73.973794, 40.764225, 4326)),
+    (3, '789 Broadway', ST_POINT(-73.989308, 40.748817, 4326)),
+    (4, '321 5th Ave', ST_POINT(-73.985428, 40.748459, 4326)),
+    (5, '567 Madison Ave', ST_POINT(-73.974036, 40.762905, 4326)),
+    (6, '890 Lexington Ave', ST_POINT(-73.968285, 40.762466, 4326)),
+    (7, '432 6th Ave', ST_POINT(-73.996702, 40.737143, 4326)),
+    (8, '765 3rd Ave', ST_POINT(-73.971635, 40.753729, 4326)),
+    (9, '234 7th Ave', ST_POINT(-73.995669, 40.743825, 4326)),
+    (10, '876 2nd Ave', ST_POINT(-73.969748, 40.750709, 4326)),
+    (11, '543 8th Ave', ST_POINT(-73.992960, 40.754672, 4326)),
+    (12, '901 1st Ave', ST_POINT(-73.963894, 40.759832, 4326));
 
 -- Insert organizations
 INSERT INTO organizations (id, name, phone) VALUES
@@ -67,25 +67,25 @@ INSERT INTO specializations (id, name, parent_id) VALUES
 
 -- Connect organizations with buildings (many-to-many)
 INSERT INTO organization_buildings (organization_id, building_id) VALUES
-    -- Tech Solutions Inc has 2 buildings
-    (1, 1), (1, 2),
-    -- Healthcare Plus has 2 buildings
-    (2, 3), (2, 4),
-    -- Education First has 1 building
+    -- Tech Solutions Inc
+    (1, 1),
+    -- Healthcare Plus
+    (2, 3),
+    -- Education First
     (3, 5),
-    -- Green Energy Co has 1 building
+    -- Green Energy Co
     (4, 6),
-    -- Financial Services Group has 2 buildings
-    (5, 7), (5, 8),
-    -- Creative Design Studio has 1 building
+    -- Financial Services Group
+    (5, 7),
+    -- Creative Design Studio
     (6, 9),
-    -- Legal Consultancy Firm has 1 building
+    -- Legal Consultancy Firm
     (7, 10),
-    -- Research & Development Lab has 1 building
+    -- Research & Development Lab
     (8, 11),
-    -- Digital Marketing Agency has 1 building
+    -- Digital Marketing Agency
     (9, 12),
-    -- Construction Solutions has shared building with Tech Solutions
+    -- Construction Solutions 
     (10, 1);
 
 -- Connect organizations with specializations (many-to-many)

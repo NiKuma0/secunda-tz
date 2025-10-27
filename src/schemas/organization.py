@@ -7,6 +7,7 @@ class Organization(pd.BaseModel):
     id: int
     name: str
     phone: str
+    building_id: int
     building_address: str
     building_coordinates: tuple[float, float]
     specializations: list[Specialization]

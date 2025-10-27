@@ -16,22 +16,6 @@ down_revision: str | Sequence[str] | None = '4ee07a7b7ea2'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-
-"""Add organization building required constraint
-
-Revision ID: add_org_bldg_req
-Revises: 4ee07a7b7ea2
-Create Date: 2025-10-24 10:00:00.000000
-"""
-from typing import Sequence
-from alembic import op
-
-revision: str = "add_org_bldg_req"
-down_revision: str | Sequence[str] | None = "4ee07a7b7ea2"
-branch_labels: str | Sequence[str] | None = None
-depends_on: str | Sequence[str] | None = None
-
-
 def upgrade() -> None:
     op.execute("""
         CREATE OR REPLACE FUNCTION ensure_org_has_building()
@@ -42,7 +26,7 @@ def upgrade() -> None:
                 FROM organization_buildings ob
                 WHERE ob.organization_id = NEW.id
             ) THEN
-                RAISE EXCEPTION 'Organization must have at least one building';
+                RAISE EXCEPTION 'Organization (id=%) must have at least one building', NEW.id;
             END IF;
             RETURN NEW;
         END;
@@ -50,8 +34,9 @@ def upgrade() -> None:
     """)
 
     op.execute("""
-        CREATE TRIGGER trg_ensure_org_has_building
+        CREATE CONSTRAINT TRIGGER trg_ensure_org_has_building
         AFTER INSERT OR UPDATE ON organizations
+        DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE FUNCTION ensure_org_has_building();
     """)

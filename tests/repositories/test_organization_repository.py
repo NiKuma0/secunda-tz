@@ -39,7 +39,7 @@ class TestOrganizationRepository:
             # Test case 1: Non-existent organization
             TestCase(
                 db_fixtures=[],
-                call=mock.call(_id=1),
+                call=mock.call(organization_id=1),
                 expected_value=None,
             ),
             # Test case 2: Organization with no specializations
@@ -49,9 +49,10 @@ class TestOrganizationRepository:
                     models.Organization(id=1, name='Simple Org', phone='+1234567890'),
                     models.OrganizationBuilding(organization_id=1, building_id=1),
                 ],
-                call=mock.call(_id=1),
+                call=mock.call(organization_id=1),
                 expected_value=schemas.Organization(
                     id=1,
+                    building_id=1,
                     name='Simple Org',
                     phone='+1234567890',
                     building_address='456 High St',
@@ -70,9 +71,10 @@ class TestOrganizationRepository:
                     models.OrganizationSpecializations(organization_id=1, specialization_id=1),
                     models.OrganizationSpecializations(organization_id=1, specialization_id=2),
                 ],
-                call=mock.call(_id=1),
+                call=mock.call(organization_id=1),
                 expected_value=schemas.Organization(
                     id=1,
+                    building_id=1,
                     name='Complex Org',
                     phone='+0987654321',
                     building_address='456 High St',
@@ -92,9 +94,10 @@ class TestOrganizationRepository:
                     models.Organization(id=50, name='High ID Org', phone='+1122334455'),
                     models.OrganizationBuilding(organization_id=50, building_id=100),
                 ],
-                call=mock.call(_id=50),
+                call=mock.call(organization_id=50),
                 expected_value=schemas.Organization(
                     id=50,
+                    building_id=100,
                     name='High ID Org',
                     phone='+1122334455',
                     building_address='789 Park Ave',
@@ -109,7 +112,7 @@ class TestOrganizationRepository:
                     models.Organization(id=1, name='Test Org', phone='123'),
                     models.OrganizationBuilding(organization_id=1, building_id=1),
                 ],
-                call=mock.call(_id=-1),
+                call=mock.call(organization_id=-1),
                 expected_value=None,
             ),
         ],
@@ -151,6 +154,7 @@ class TestOrganizationRepository:
                             phone='+1234567890',
                             building_address='123 Main St',
                             building_coordinates=(51.5074, -0.1278),
+                            building_id=1,
                             specializations=[],
                         ),
                     ]
@@ -173,6 +177,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='First Org',
                             phone='+1111111111',
                             building_address='456 High St',
@@ -183,6 +188,7 @@ class TestOrganizationRepository:
                         ),
                         schemas.Organization(
                             id=2,
+                            building_id=1,
                             name='Second Org',
                             phone='+2222222222',
                             building_address='456 High St',
@@ -208,6 +214,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='Special Chars Org',
                             phone='+1234567890',
                             building_address="42/3 O'Brien St., #101-A",
@@ -233,6 +240,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=2,
+                            building_id=1,
                             name='Org 2',
                             phone='222',
                             building_address='Shared Address',
@@ -241,6 +249,7 @@ class TestOrganizationRepository:
                         ),
                         schemas.Organization(
                             id=3,
+                            building_id=1,
                             name='Org 3',
                             phone='333',
                             building_address='Shared Address',
@@ -277,6 +286,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=2,
+                            building_id=1,
                             name='Org 2',
                             phone='222',
                             building_address='Shared Address',
@@ -285,6 +295,7 @@ class TestOrganizationRepository:
                         ),
                         schemas.Organization(
                             id=3,
+                            building_id=1,
                             name='Org 3',
                             phone='333',
                             building_address='Shared Address',
@@ -309,6 +320,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='Org Near',
                             phone='111',
                             building_address='Near',
@@ -351,6 +363,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=2,
+                            building_id=2,
                             name='Org B',
                             phone='222',
                             building_address='B',
@@ -359,6 +372,7 @@ class TestOrganizationRepository:
                         ),
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='Org A',
                             phone='111',
                             building_address='A',
@@ -381,6 +395,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='Multi Org',
                             phone='777',
                             building_address='Main',
@@ -396,7 +411,7 @@ class TestOrganizationRepository:
         await fill_db(session, case.db_fixtures)
         repo = OrganizationRepository(session=session)
 
-        res = await repo.get_by_radius(*case.call.args, **case.call.kwargs)
+        res = await repo.get_by_building_location_radius(*case.call.args, **case.call.kwargs)
 
         assert res == case.expected_value
 
@@ -416,6 +431,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=2,
+                            building_id=1,
                             name='Org 2',
                             phone='222',
                             building_address='Shared Address',
@@ -424,6 +440,7 @@ class TestOrganizationRepository:
                         ),
                         schemas.Organization(
                             id=3,
+                            building_id=1,
                             name='Org 3',
                             phone='333',
                             building_address='Shared Address',
@@ -447,6 +464,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='Org Near',
                             phone='111',
                             building_address='Near',
@@ -479,6 +497,7 @@ class TestOrganizationRepository:
                     organizations=[
                         schemas.Organization(
                             id=2,
+                            building_id=2,
                             name='Org B',
                             phone='222',
                             building_address='B',
@@ -487,6 +506,7 @@ class TestOrganizationRepository:
                         ),
                         schemas.Organization(
                             id=1,
+                            building_id=1,
                             name='Org A',
                             phone='111',
                             building_address='A',
@@ -502,6 +522,6 @@ class TestOrganizationRepository:
         await fill_db(session, case.db_fixtures)
         repo = OrganizationRepository(session=session)
 
-        res = await repo.get_by_box(*case.call.args, **case.call.kwargs)
+        res = await repo.get_by_building_location_box(*case.call.args, **case.call.kwargs)
 
         assert res == case.expected_value

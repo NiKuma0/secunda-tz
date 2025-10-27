@@ -1,19 +1,19 @@
 import typing
 
+import fastapi
 import sqlalchemy as sa
 from geoalchemy2 import Geography
 from geoalchemy2.shape import to_shape
 from sqlalchemy import orm
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src import models, schemas
+from src import deps, models, schemas
 
 if typing.TYPE_CHECKING:
     from shapely import Point
 
 
 class OrganizationRepository:
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: deps.SessionDep):
         self._session = session
 
     @staticmethod
@@ -23,6 +23,7 @@ class OrganizationRepository:
             id=model.id,
             name=model.name,
             phone=model.phone,
+            building_id=model.building.id,
             building_address=model.building.address,
             building_coordinates=(coords.x, coords.y),
             specializations=[
@@ -31,14 +32,14 @@ class OrganizationRepository:
             ],
         )
 
-    async def get_by_id(self, _id: int) -> schemas.Organization | None:
+    async def get_by_id(self, organization_id: int) -> schemas.Organization | None:
         query = (
             sa.select(models.Organization)
             .options(
                 orm.joinedload(models.Organization.building),
                 orm.joinedload(models.Organization.specializations),
             )
-            .where(models.Organization.id == _id)
+            .where(models.Organization.id == organization_id)
             .limit(1)
         )
         result = await self._session.scalar(query)
@@ -66,20 +67,40 @@ class OrganizationRepository:
         organizations = result.unique().all()
         return schemas.ListOrganizations(organizations=list(map(self._model_to_schema, organizations)))
 
-    async def get_by_specialization(
+    async def get_by_building_id(
         self,
-        spec_ids: list[int],
+        building_id: int,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> schemas.ListOrganizations:
+        query = (
+            sa.select(models.Organization)
+            .options(
+                orm.joinedload(models.Organization.building),
+                orm.joinedload(models.Organization.specializations),
+            )
+            .where(models.Building.id == building_id)
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.scalars(query)
+        organizations = result.unique().all()
+        return schemas.ListOrganizations(organizations=list(map(self._model_to_schema, organizations)))
+
+    async def get_by_specializations(
+        self,
+        specs: list[int],
         limit: int = 10,
         offset: int = 0,
     ) -> schemas.ListOrganizations:
         query = (
             sa.select(models.Organization)
             .join(models.OrganizationSpecializations)
-            .where(models.OrganizationSpecializations.specialization_id.in_(spec_ids))
+            .where(models.OrganizationSpecializations.specialization_id.in_(specs))
             .group_by(models.Organization.id)
             # Having count(distinct specialization_id) = len(spec_ids) ensures
             # the organization has ALL requested specializations
-            .having(sa.func.count(sa.distinct(models.OrganizationSpecializations.specialization_id)) == len(spec_ids))
+            .having(sa.func.count(sa.distinct(models.OrganizationSpecializations.specialization_id)) == len(specs))
             .options(
                 orm.joinedload(models.Organization.building),
                 orm.joinedload(models.Organization.specializations),
@@ -91,7 +112,7 @@ class OrganizationRepository:
         organizations = result.all()
         return schemas.ListOrganizations(organizations=list(map(self._model_to_schema, organizations)))
 
-    async def get_by_radius(
+    async def get_by_building_location_radius(
         self,
         latitude: float,
         longitude: float,
@@ -135,7 +156,7 @@ class OrganizationRepository:
         organizations = result.unique().all()
         return schemas.ListOrganizations(organizations=list(map(self._model_to_schema, organizations)))
 
-    async def get_by_box(
+    async def get_by_building_location_box(
         self,
         ll_latitude: float,
         ll_longitude: float,
@@ -186,3 +207,21 @@ class OrganizationRepository:
         result = await self._session.scalars(query)
         organizations = result.unique().all()
         return schemas.ListOrganizations(organizations=list(map(self._model_to_schema, organizations)))
+
+    async def get_by_name(self, name: str, *, limit: int = 10, offset: int = 0) -> schemas.ListOrganizations:
+        query = (
+            sa.select(models.Organization)
+            .where(models.Organization.name == name)
+            .options(
+                orm.joinedload(models.Organization.building),
+                orm.joinedload(models.Organization.specializations),
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.scalars(query)
+        organizations = result.unique().all()
+        return schemas.ListOrganizations(organizations=list(map(self._model_to_schema, organizations)))
+
+
+OrganizationRepositoryDep = typing.Annotated[OrganizationRepository, fastapi.Depends(OrganizationRepository)]
