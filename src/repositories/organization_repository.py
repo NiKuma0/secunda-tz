@@ -56,11 +56,13 @@ class OrganizationRepository:
     ) -> schemas.ListOrganizations:
         query = (
             sa.select(models.Organization)
+            .join(models.OrganizationBuilding)
+            .join(models.Building)
             .options(
                 orm.joinedload(models.Organization.building),
                 orm.joinedload(models.Organization.specializations),
             )
-            .where(models.Building.address == address)
+            .where(models.Building.search_vector.op('@@')(sa.func.plainto_tsquery('english', address)))
             .limit(limit)
             .offset(offset)
         )
@@ -212,7 +214,7 @@ class OrganizationRepository:
     async def get_by_name(self, name: str, *, limit: int = 10, offset: int = 0) -> schemas.ListOrganizations:
         query = (
             sa.select(models.Organization)
-            .where(models.Organization.name == name)
+            .where(models.Organization.search_vector.op('@@')(sa.func.plainto_tsquery('english', name)))
             .options(
                 orm.joinedload(models.Organization.building),
                 orm.joinedload(models.Organization.specializations),

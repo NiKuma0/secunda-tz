@@ -39,7 +39,7 @@ def upgrade() -> None:
             ),
             nullable=False,
         ),
-        sa.Column('search_vector', postgresql.TSVECTOR(), nullable=False),
+        sa.Column('search_vector', postgresql.TSVECTOR(), nullable=True),
         sa.PrimaryKeyConstraint('id'),
     )
     op.create_table(
@@ -47,7 +47,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('phone', sa.String(), nullable=False),
-        sa.Column('search_vector', postgresql.TSVECTOR(), nullable=False),
+        sa.Column('search_vector', postgresql.TSVECTOR(), nullable=True),
         sa.PrimaryKeyConstraint('id'),
     )
     op.create_table(

@@ -1,8 +1,8 @@
-"""Init search vectors trigers
+"""Init search vectors triggers
 
 Revision ID: search_vector
 Revises: funcs_trgs
-Create Date: 2025-10-27 22:09:11.376764
+Create Date: 2025-10-27 22:34:21.201074
 
 """
 
@@ -29,27 +29,27 @@ def upgrade() -> None:
     )
     op.create_entity(public_buildings_trg_building_update_search_vector)
 
-    public_specializations_trg_specialization_update_search_vector = PGTrigger(
+    public_organizations_trg_organizations_update_search_vector = PGTrigger(
         schema='public',
-        signature='trg_specialization_update_search_vector',
-        on_entity='public.specializations',
+        signature='trg_organizations_update_search_vector',
+        on_entity='public.organizations',
         is_constraint=False,
-        definition="BEFORE INSERT OR UPDATE ON specializations\n        FOR EACH ROW\n        EXECUTE FUNCTION tsvector_update_trigger(search_vector, 'pg_catalog.english', name)",
+        definition="BEFORE INSERT OR UPDATE ON organizations\n        FOR EACH ROW\n        EXECUTE FUNCTION tsvector_update_trigger(search_vector, 'pg_catalog.english', name)",
     )
-    op.create_entity(public_specializations_trg_specialization_update_search_vector)
+    op.create_entity(public_organizations_trg_organizations_update_search_vector)
 
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    public_specializations_trg_specialization_update_search_vector = PGTrigger(
+    public_organizations_trg_organizations_update_search_vector = PGTrigger(
         schema='public',
-        signature='trg_specialization_update_search_vector',
-        on_entity='public.specializations',
+        signature='trg_organizations_update_search_vector',
+        on_entity='public.organizations',
         is_constraint=False,
-        definition="BEFORE INSERT OR UPDATE ON specializations\n        FOR EACH ROW\n        EXECUTE FUNCTION tsvector_update_trigger(search_vector, 'pg_catalog.english', name)",
+        definition="BEFORE INSERT OR UPDATE ON organizations\n        FOR EACH ROW\n        EXECUTE FUNCTION tsvector_update_trigger(search_vector, 'pg_catalog.english', name)",
     )
-    op.drop_entity(public_specializations_trg_specialization_update_search_vector)
+    op.drop_entity(public_organizations_trg_organizations_update_search_vector)
 
     public_buildings_trg_building_update_search_vector = PGTrigger(
         schema='public',

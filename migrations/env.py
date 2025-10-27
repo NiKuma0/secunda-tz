@@ -19,7 +19,7 @@ ENTITIES = (
     functions.ensure_org_has_building,
     triggers.trg_ensure_org_has_building,
     triggers.trg_building_update_search_vector,
-    triggers.trg_specialization_update_search_vector,
+    triggers.trg_organizations_update_search_vector,
 )
 ENTITIES_NAMES = {entity.to_variable_name() for entity in ENTITIES}
 ENTITIES_TYPES = {'trigger', 'function'}

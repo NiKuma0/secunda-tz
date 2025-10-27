@@ -24,12 +24,12 @@ trg_specialization_depth_check = pg_trigger.PGTrigger(
     """,
 )
 
-trg_specialization_update_search_vector = pg_trigger.PGTrigger(
+trg_organizations_update_search_vector = pg_trigger.PGTrigger(
     schema='public',
-    signature='trg_specialization_update_search_vector',
-    on_entity='public.specializations',
+    signature='trg_organizations_update_search_vector',
+    on_entity='public.organizations',
     definition="""
-        BEFORE INSERT OR UPDATE ON specializations
+        BEFORE INSERT OR UPDATE ON organizations
         FOR EACH ROW
         EXECUTE FUNCTION tsvector_update_trigger(search_vector, 'pg_catalog.english', name);
     """,

@@ -18,10 +18,12 @@ class Organization(Base):
     name: orm.Mapped[str]
     phone: orm.Mapped[str]
 
-    # Non-optional association - every organization must have a building
-    building_assoc: orm.Mapped['OrganizationBuilding'] = orm.relationship('OrganizationBuilding', uselist=False)
+    building_assoc: orm.Mapped['OrganizationBuilding'] = orm.relationship(
+        'OrganizationBuilding',
+        uselist=False,
+        viewonly=True,
+    )
 
-    # Convenience property to get the building directly
     building: orm.Mapped['Building'] = orm.relationship(
         'Building',
         secondary='organization_buildings',
@@ -32,5 +34,6 @@ class Organization(Base):
         'Specialization',
         secondary='organization_specializations',
         backref='organizations',
+        viewonly=True,
     )
     search_vector: orm.Mapped[str] = orm.mapped_column(psql.TSVECTOR, nullable=True)

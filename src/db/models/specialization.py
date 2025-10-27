@@ -15,8 +15,10 @@ class Specialization(Base):
     parent: orm.Mapped['Specialization | None'] = orm.relationship(
         back_populates='children',
         remote_side='Specialization.id',
+        viewonly=True,
     )
     children: orm.Mapped[list['Specialization']] = orm.relationship(
         back_populates='parent',
         cascade='all, delete-orphan',
+        viewonly=True,
     )
