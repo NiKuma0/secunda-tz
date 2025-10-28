@@ -13,12 +13,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM python:3.13-slim-bookworm
 
+WORKDIR /app
+
 ENV PYTHONPATH="/app:/app" \
     PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder --chown=app:app /app /app
-COPY ./src ./migrations alembic.ini /app/
-
 COPY --chown=app:app . /app
 
 CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -20,16 +20,16 @@ services:
   migrations:
     build: ./
     environment:
-      - POSTGRES_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/app
+      - POSTGRES_DSN=postgresql+asyncpg://postgres:postgres@db:5432/app
     depends_on:
       db:
         condition: service_healthy
-    command: alembic upgrade head
+    command: alembic upgrade dev@head
 
   app:
     build: ./
     environment:
-      - POSTGRES_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/app
+      - POSTGRES_DSN=postgresql+asyncpg://postgres:postgres@db:5432/app
     ports:
       - 8000:8000
     depends_on:

@@ -1,5 +1,23 @@
-BEGIN;
+"""empty message
 
+Revision ID: fill_db
+Revises: search_vector
+Create Date: 2025-10-28 14:08:05.763128
+
+"""
+
+from collections.abc import Sequence
+from alembic import op
+
+# revision identifiers, used by Alembic.
+revision: str = 'fill_db'
+down_revision: str | Sequence[str] | None = 'search_vector'
+branch_labels: str | Sequence[str] | None = ('dev',)
+depends_on: str | Sequence[str] | None = None
+
+
+def upgrade() -> None:
+    op.execute("""
 -- Insert buildings
 INSERT INTO buildings (id, address, point) VALUES
     (1, '123 Main St', ST_POINT(-73.935242, 40.730610, 4326)),
@@ -14,7 +32,9 @@ INSERT INTO buildings (id, address, point) VALUES
     (10, '876 2nd Ave', ST_POINT(-73.969748, 40.750709, 4326)),
     (11, '543 8th Ave', ST_POINT(-73.992960, 40.754672, 4326)),
     (12, '901 1st Ave', ST_POINT(-73.963894, 40.759832, 4326));
+""")
 
+    op.execute("""
 -- Insert organizations
 INSERT INTO organizations (id, name, phone) VALUES
     (1, 'Tech Solutions Inc', '+1-555-0123'),
@@ -27,7 +47,10 @@ INSERT INTO organizations (id, name, phone) VALUES
     (8, 'Research & Development Lab', '+1-555-0130'),
     (9, 'Digital Marketing Agency', '+1-555-0131'),
     (10, 'Construction Solutions', '+1-555-0132');
+""")
 
+
+    op.execute("""
 -- Insert specializations with hierarchical structure
 INSERT INTO specializations (id, name, parent_id) VALUES
     -- Tech & Software (1-5)
@@ -64,7 +87,8 @@ INSERT INTO specializations (id, name, parent_id) VALUES
     (23, 'Risk Assessment', NULL),
     (24, 'Corporate Finance', 21),
     (25, 'Market Analysis', 23);
-
+""")
+    op.execute("""
 -- Connect organizations with buildings (many-to-many)
 INSERT INTO organization_buildings (organization_id, building_id) VALUES
     -- Tech Solutions Inc
@@ -88,6 +112,9 @@ INSERT INTO organization_buildings (organization_id, building_id) VALUES
     -- Construction Solutions 
     (10, 1);
 
+""")
+
+    op.execute("""
 -- Connect organizations with specializations (many-to-many)
 INSERT INTO organization_specializations (organization_id, specialization_id) VALUES
     -- Tech Solutions Inc
@@ -110,5 +137,8 @@ INSERT INTO organization_specializations (organization_id, specialization_id) VA
     (9, 2), -- They do web development
     -- Construction Solutions
     (10, 19), (10, 20); -- They do construction management and infrastructure
+""")
 
-COMMIT;
+
+def downgrade() -> None:
+    pass
